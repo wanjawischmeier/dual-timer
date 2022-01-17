@@ -57,6 +57,7 @@
         android:layout_marginTop="64dp"
         android:buttonTint="#FFFFFF"
         android:text="Sound"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -68,6 +69,7 @@
         android:layout_marginTop="12dp"
         android:minHeight="48dp"
         android:text="Vibrate"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sound_switch" />
 
@@ -78,7 +80,7 @@
         android:layout_height="47dp"
         android:indeterminate="false"
         android:max="29"
-        android:progress="1"
+        android:progress="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

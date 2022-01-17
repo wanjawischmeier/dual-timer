@@ -50,13 +50,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun selectTimer(timerView: View) {
-        var time: Int
-        if (selected.id == R.id.timer1)
-            time = time1
-        else
-            time = time2
+        var oldTime: Int
+        var newTime: Int
+        if (selected.id == R.id.timer1) {
+            oldTime = time1
+            newTime = time2
+        }
+        else {
+            oldTime = time2
+            newTime = time1
+        }
 
-        selected.text = time.toString().padStart(2, '0') + " : 00"
+        if (timerRunning && newTime == 0) return
+
+        selected.text = oldTime.toString().padStart(2, '0') + " : 00"
         selected.scaleX = 1f
         selected.scaleY = 1f
         selected = timerView as TextView
@@ -89,15 +96,16 @@ class MainActivity : AppCompatActivity() {
             seekBar.isEnabled = true
         }
         else {
-            seekBar.isEnabled = false
-
             val seconds: Int
             if (selected.id == R.id.timer1)
                 seconds = time1
             else
                 seconds = time2
-            // val time = seconds.toLong() * 60000
-            val time = seconds.toLong() * 1000
+
+            if (seconds == 0) return
+            val time = seconds.toLong() * 60000
+
+            seekBar.isEnabled = false
 
             timer = object : CountDownTimer(time, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
@@ -113,23 +121,28 @@ class MainActivity : AppCompatActivity() {
                 override fun onFinish() {
                     timerRunning = false
 
-                    var time: Int
+                    var oldTime: Int
+                    var newTime: Int
                     var newSelected: TextView
 
                     if (selected.id == R.id.timer1) {
                         sound1.start()
-                        time = time1
+                        oldTime = time1
+                        newTime = time2
                         newSelected = findViewById(R.id.timer2)
                     }
                     else {
                         sound2.start()
-                        time = time2
+                        oldTime = time2
+                        newTime = time1
                         newSelected = findViewById(R.id.timer1)
                     }
 
-                    selected.text = time.toString().padStart(2, '0') + " : 00"
+                    selected.text = oldTime.toString().padStart(2, '0') + " : 00"
 
-                    selectTimer(newSelected)
+                    if (newTime != 0)
+                        selectTimer(newSelected)
+
                     toggleTimer()
                 }
             }
