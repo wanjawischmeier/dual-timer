@@ -1,5 +1,6 @@
 package com.dualtimer
 
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -18,7 +19,11 @@ class MainActivity : AppCompatActivity() {
 
         val listener = object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                selected.text = (progress +1).toString()
+                // progress = 20
+                // out = 20:00
+
+                var minutes = (progress +1).toString().padStart(2, '0')
+                selected.text = "$minutes : 00"
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {}
@@ -47,21 +52,30 @@ class MainActivity : AppCompatActivity() {
         val attributes = VibrationAttributes.USAGE_ALARM
         */
 
+
+
         if (timerRunning) {
 
         }
         else {
-            val time = selected.text.toString().toLong() * 1000
+            var text = selected.text.toString()
+            var seconds = text.substring(0, 2).toLong()
+            val time = seconds * 60000
 
             object : CountDownTimer(time, 1000) {
-
                 override fun onTick(millisUntilFinished: Long) {
-                    selected.text = (millisUntilFinished / 1000).toString()
+                    var leftSeconds = millisUntilFinished / 1000
+                    var shownSeconds = leftSeconds % 60
+                    var shownMinutes = (leftSeconds - shownSeconds) / 60
+                    var shownMinutesString = shownMinutes.toString().padStart(2, '0')
+                    var shownSecondsString = shownSeconds.toString().padStart(2, '0')
+
+                    selected.text = "$shownMinutesString : $shownSecondsString"
                 }
 
                 override fun onFinish() {
-                    // mTextField.setText("done!")
                     Toast.makeText(applicationContext, "timer done", Toast.LENGTH_SHORT).show()
+                    MediaPlayer.create(applicationContext, R.raw.lol).start()
                 }
             }.start()
         }
