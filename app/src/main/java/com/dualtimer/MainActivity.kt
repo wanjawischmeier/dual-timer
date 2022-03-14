@@ -7,16 +7,17 @@ import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.getSystemService
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
     lateinit var seekBar: SeekBar
     lateinit var selected: TextView
     lateinit var timer: CountDownTimer
-    lateinit var sound1: MediaPlayer
-    lateinit var sound2: MediaPlayer
+    lateinit var sounds: Array<MediaPlayer>
     var timerRunning = false
     var time1 = 0
     var time2 = 0
+    var numSounds = 10
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +46,10 @@ class MainActivity : AppCompatActivity() {
         selected.scaleX = 1.1f
         selected.scaleY = 1.1f
 
-        sound1 = MediaPlayer.create(applicationContext, R.raw.wooden_train_whistle)
-        sound2 = MediaPlayer.create(applicationContext, R.raw.wooden_train_whistle)
+        sounds = Array(numSounds) {
+            i -> val id = resources.getIdentifier("sound$i", "raw", packageName)
+            return@Array MediaPlayer.create(applicationContext, id)
+        }
     }
 
     fun selectTimer(timerView: View) {
@@ -103,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                 seconds = time2
 
             if (seconds == 0) return
-            val time = seconds.toLong() * 60000
+            val time = seconds.toLong() * 6000
 
             seekBar.isEnabled = false
 
@@ -126,13 +129,15 @@ class MainActivity : AppCompatActivity() {
                     var newSelected: TextView
 
                     if (selected.id == R.id.timer1) {
-                        sound1.start()
+                        val index = Random.nextInt(numSounds / 2 - 1)
+                        sounds[index].start()
                         oldTime = time1
                         newTime = time2
                         newSelected = findViewById(R.id.timer2)
                     }
                     else {
-                        sound2.start()
+                        val index = Random.nextInt(numSounds / 2, numSounds - 1)
+                        sounds[index].start()
                         oldTime = time2
                         newTime = time1
                         newSelected = findViewById(R.id.timer1)
