@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     var timerRunning = false
     var time1 = 0
     var time2 = 0
-    var numSounds = 10
+    var numSounds = 4
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,14 +129,14 @@ class MainActivity : AppCompatActivity() {
                     var newSelected: TextView
 
                     if (selected.id == R.id.timer1) {
-                        val index = Random.nextInt(numSounds / 2 - 1)
+                        val index = Random.nextInt(numSounds / 2)
                         sounds[index].start()
                         oldTime = time1
                         newTime = time2
                         newSelected = findViewById(R.id.timer2)
                     }
                     else {
-                        val index = Random.nextInt(numSounds / 2, numSounds - 1)
+                        val index = Random.nextInt(numSounds / 2, numSounds)
                         sounds[index].start()
                         oldTime = time2
                         newTime = time1
