@@ -1,18 +1,18 @@
 package com.dualtimer
 
 import android.media.MediaPlayer
-import android.os.*
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.View
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.core.content.getSystemService
+import androidx.appcompat.app.AppCompatActivity
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
-    lateinit var seekBar: SeekBar
+    private lateinit var seekBar: SeekBar
+    private lateinit var timer: CountDownTimer
     lateinit var selected: TextView
-    lateinit var timer: CountDownTimer
     lateinit var sounds: Array<MediaPlayer>
     var timerRunning = false
     var time1 = 0
@@ -26,14 +26,14 @@ class MainActivity : AppCompatActivity() {
 
         val listener = object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                var minutes = progress +1
+                val minutes = progress + 1
                 if (selected.id == R.id.timer1)
                     time1 = minutes
                 else
                     time2 = minutes
 
-                var minuteString = minutes.toString().padStart(2, '0')
-                selected.text = "$minuteString : 00"
+                val shownMinutesString = minutes.toString().padStart(2, '0')
+                selected.text = getString(R.string.timer_template, shownMinutesString, "00")
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {}
@@ -53,8 +53,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun selectTimer(timerView: View) {
-        var oldTime: Int
-        var newTime: Int
+        val oldTime: Int
+        val newTime: Int
         if (selected.id == R.id.timer1) {
             oldTime = time1
             newTime = time2
@@ -66,7 +66,8 @@ class MainActivity : AppCompatActivity() {
 
         if (timerRunning && newTime == 0) return
 
-        selected.text = oldTime.toString().padStart(2, '0') + " : 00"
+        val shownMinutesString = oldTime.toString().padStart(2, '0')
+        selected.text = getString(R.string.timer_template, shownMinutesString, "00")
         selected.scaleX = 1f
         selected.scaleY = 1f
         selected = timerView as TextView
@@ -80,30 +81,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun toggleTimer(view: View? = null) {
-        /*
-        val vibrator = getSystemService(Vibrator::class.java)
-        val vibe = VibrationEffect.createOneShot(100, 1)
-        vibrator.vibrate(vibe)
-         */
-
         if (timerRunning) {
             timer.cancel()
             timerRunning = false
 
             val timer1 = findViewById<TextView>(R.id.timer1)
             val timer2 = findViewById<TextView>(R.id.timer2)
-            timer1.text = time1.toString().padStart(2, '0') + " : 00"
-            timer2.text = time2.toString().padStart(2, '0') + " : 00"
+
+            val shownMinutesString1 = time1.toString().padStart(2, '0')
+            val shownMinutesString2 = time2.toString().padStart(2, '0')
+
+            timer1.text = getString(R.string.timer_template, shownMinutesString1, "00")
+            timer2.text = getString(R.string.timer_template, shownMinutesString2, "00")
 
             seekBar.isEnabled = true
         }
         else {
-            val seconds: Int
-            if (selected.id == R.id.timer1)
-                seconds = time1
+            val seconds: Int = if (selected.id == R.id.timer1)
+                time1
             else
-                seconds = time2
+                time2
 
             if (seconds == 0) return
             val time = seconds.toLong() * 6000
@@ -112,40 +111,38 @@ class MainActivity : AppCompatActivity() {
 
             timer = object : CountDownTimer(time, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
-                    val leftSeconds = millisUntilFinished / 1000
+                    val leftSeconds = (millisUntilFinished / 1000).toInt()
                     val shownSeconds = leftSeconds % 60
                     val shownMinutes = (leftSeconds - shownSeconds) / 60
-                    val shownMinutesString = shownMinutes.toString().padStart(2, '0')
-                    val shownSecondsString = shownSeconds.toString().padStart(2, '0')
 
-                    selected.text = "$shownMinutesString : $shownSecondsString"
+                    selected.text = padTimer(shownMinutes, shownSeconds)
                 }
 
                 override fun onFinish() {
                     timerRunning = false
 
-                    var oldTime: Int
-                    var newTime: Int
-                    var newSelected: TextView
+                    val oldMinutes: Int
+                    val newMinutes: Int
+                    val newSelected: TextView
 
                     if (selected.id == R.id.timer1) {
                         val index = Random.nextInt(numSounds / 2)
                         sounds[index].start()
-                        oldTime = time1
-                        newTime = time2
+                        oldMinutes = time1
+                        newMinutes = time2
                         newSelected = findViewById(R.id.timer2)
                     }
                     else {
                         val index = Random.nextInt(numSounds / 2, numSounds)
                         sounds[index].start()
-                        oldTime = time2
-                        newTime = time1
+                        oldMinutes = time2
+                        newMinutes = time1
                         newSelected = findViewById(R.id.timer1)
                     }
 
-                    selected.text = oldTime.toString().padStart(2, '0') + " : 00"
+                    selected.text = padTimer(oldMinutes)
 
-                    if (newTime != 0)
+                    if (newMinutes != 0)
                         selectTimer(newSelected)
 
                     toggleTimer()
@@ -154,5 +151,16 @@ class MainActivity : AppCompatActivity() {
             timer.start()
             timerRunning = true
         }
+    }
+
+    fun padTimer(minutes: Int = 0, seconds: Int = 0): String {
+        val shownMinutesString = padTime(minutes)
+        val shownSecondsString = padTime(seconds)
+
+        return getString(R.string.timer_template, shownMinutesString, shownSecondsString)
+    }
+
+    private fun padTime(time: Int): String {
+        return time.toString().padStart(2, '0')
     }
 }
