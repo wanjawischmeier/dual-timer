@@ -32,8 +32,7 @@ class MainActivity : AppCompatActivity() {
                 else
                     time2 = minutes
 
-                val shownMinutesString = minutes.toString().padStart(2, '0')
-                selected.text = getString(R.string.timer_template, shownMinutesString, "00")
+                selected.text = padTimer(minutes)
             }
 
             override fun onStartTrackingTouch(p0: SeekBar?) {}
@@ -66,8 +65,7 @@ class MainActivity : AppCompatActivity() {
 
         if (timerRunning && newTime == 0) return
 
-        val shownMinutesString = oldTime.toString().padStart(2, '0')
-        selected.text = getString(R.string.timer_template, shownMinutesString, "00")
+        selected.text = padTimer(oldTime)
         selected.scaleX = 1f
         selected.scaleY = 1f
         selected = timerView as TextView
@@ -90,11 +88,8 @@ class MainActivity : AppCompatActivity() {
             val timer1 = findViewById<TextView>(R.id.timer1)
             val timer2 = findViewById<TextView>(R.id.timer2)
 
-            val shownMinutesString1 = time1.toString().padStart(2, '0')
-            val shownMinutesString2 = time2.toString().padStart(2, '0')
-
-            timer1.text = getString(R.string.timer_template, shownMinutesString1, "00")
-            timer2.text = getString(R.string.timer_template, shownMinutesString2, "00")
+            timer1.text = padTimer(time1)
+            timer2.text = padTimer(time2)
 
             seekBar.isEnabled = true
         }
@@ -105,7 +100,7 @@ class MainActivity : AppCompatActivity() {
                 time2
 
             if (seconds == 0) return
-            val time = seconds.toLong() * 6000
+            val time = seconds.toLong() * 60000
 
             seekBar.isEnabled = false
 
